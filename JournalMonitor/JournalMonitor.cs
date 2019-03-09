@@ -1,4 +1,5 @@
 ﻿using Eddi;
+using EddiCrimeMonitor;
 using EddiDataDefinitions;
 using EddiDataProviderService;
 using EddiEvents;
@@ -2122,6 +2123,7 @@ namespace EddiJournalMonitor
                             case "LoadGame":
                                 {
                                     string commander = JsonParsing.getString(data, "Commander");
+                                    bool horizons = JsonParsing.getBool(data, "Horizons");
 
                                     data.TryGetValue("ShipID", out object val);
                                     int? shipId = (int?)(long?)val;
@@ -2148,7 +2150,7 @@ namespace EddiJournalMonitor
                                     decimal? fuel = JsonParsing.getOptionalDecimal(data, "FuelLevel");
                                     decimal? fuelCapacity = JsonParsing.getOptionalDecimal(data, "FuelCapacity");
 
-                                    events.Add(new CommanderContinuedEvent(timestamp, commander, (int)shipId, ship, shipName, shipIdent, mode, group, credits, loan, fuel, fuelCapacity) { raw = line, fromLoad = fromLogLoad });
+                                    events.Add(new CommanderContinuedEvent(timestamp, commander, horizons, (int)shipId, ship, shipName, shipIdent, mode, group, credits, loan, fuel, fuelCapacity) { raw = line, fromLoad = fromLogLoad });
                                     handled = true;
                                     break;
                                 }

@@ -11,7 +11,7 @@ namespace EddiDataProviderService
     /// <summary>Access to EDDP legacy server data<summary>
     public class LegacyEddpService
     {
-        private const string BASE = "http://api.eddp.co:8080/";
+        private const string BASE = "http://151.80.149.216:8080/";
 
         static LegacyEddpService()
         {
