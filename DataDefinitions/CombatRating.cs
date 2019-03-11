@@ -25,6 +25,7 @@ namespace EddiDataDefinitions
         }
 
         public int rank { get; private set; }
+        public int profitshare => (rank + 1) * 2;
 
         // dummy used to ensure that the static constructor has run
         public CombatRating() : this("", 0)

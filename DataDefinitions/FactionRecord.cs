@@ -109,7 +109,8 @@ namespace EddiDataDefinitions
             }
         }
 
-        public List<CrimeReport> reportData { get; set; }
+        public List<FactionReport> claimReports { get; set; }
+        public List<FactionReport> crimeReports { get; set; }
 
         // Default Constructor
         public FactionRecord() { }
@@ -118,7 +119,8 @@ namespace EddiDataDefinitions
         public FactionRecord(string faction)
         {
             this.faction = faction;
-            reportData = new List<CrimeReport>();
+            claimReports = new List<FactionReport>();
+            crimeReports = new List<FactionReport>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

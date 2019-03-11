@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace EddiDataDefinitions
 {
-    public class CrimeReport
+    public class FactionReport
     {
         public DateTime timestamp { get; set; }
 
@@ -25,7 +23,7 @@ namespace EddiDataDefinitions
 
         // The crime description, localized
         [JsonIgnore]
-        public string localizedCrime => crimeDef?.localizedName ?? null;
+        public string localizedCrime => (crimeDef ?? Crime.None).localizedName;
 
         // deprecated crime description (exposed to Cottle and VA)
         [JsonIgnore, Obsolete("Please use localizedCrime instead")]
@@ -38,27 +36,28 @@ namespace EddiDataDefinitions
 
         public string victim { get; set; }
 
-        public decimal amount { get; set; }
+        public long amount { get; set; }
 
-        public CrimeReport() { }
+        public FactionReport() { }
 
-        public CrimeReport(CrimeReport crimeReport)
+        public FactionReport(FactionReport factionReport)
         {
-            bounty = crimeReport.bounty;
-            shipId = crimeReport.shipId;
-            crimeEDName = crimeReport.crimeEDName;
-            system = crimeReport.system;
-            victim = crimeReport.victim;
-            amount = crimeReport.amount;
-            timestamp = crimeReport.timestamp;
+            bounty = factionReport.bounty;
+            shipId = factionReport.shipId;
+            crimeDef = factionReport.crimeDef;
+            crimeEDName = factionReport.crimeEDName;
+            system = factionReport.system;
+            victim = factionReport.victim;
+            amount = factionReport.amount;
+            timestamp = factionReport.timestamp;
         }
 
-        public CrimeReport(DateTime Timestamp, bool Bounty, int ShipId, Crime Crime, string System, decimal Amount)
+        public FactionReport(DateTime Timestamp, bool Bounty, int ShipId, Crime Crime, string System, long Amount)
         {
             timestamp = Timestamp;
             bounty = Bounty;
             shipId = ShipId;
-            crimeDef = Crime;
+            crimeDef = Crime ?? Crime.None;
             system = System;
             amount = Amount;
         }

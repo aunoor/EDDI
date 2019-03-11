@@ -83,6 +83,9 @@ namespace EddiDataDefinitions
         [JsonIgnore, Obsolete("Please use localizedName or invariantName")]
         public string combatrating => CombatRating?.localizedName;
 
+        /// <summary>The crew member's profit share</summary>
+        public int profitshare => CombatRating.profitshare;
+
         /// <summary>The crew member's status</summary>
         public bool active { get; set; }
 
