@@ -41,29 +41,25 @@ namespace EddiCrimeMonitor
         private void updateRecord(object sender, RoutedEventArgs e)
         {
             FactionRecord record = (FactionRecord)((Button)e.Source).DataContext;
-            if (record.name != null || record.name != Properties.CrimeMonitor.blank_faction)
+            if (record.faction != Properties.CrimeMonitor.blank_faction)
             {
-                if (record.system != null)
-                {
-                    Button updateButton = (Button)sender;
-                    updateButton.Foreground = Brushes.Red;
-                    updateButton.FontWeight = FontWeights.Bold;
+                Button updateButton = (Button)sender;
+                updateButton.Foreground = Brushes.Red;
+                updateButton.FontWeight = FontWeights.Bold;
 
-                    Thread factionStationThread = new Thread(() =>
+                Thread factionStationThread = new Thread(() =>
+                {
+                    crimeMonitor()?.GetFactionData(record, record.system);
+                    Dispatcher?.Invoke(() =>
                     {
-                        crimeMonitor()?.GetFactionData(record, record.system);
-                        Dispatcher?.Invoke(() =>
-                        {
-                            updateButton.Foreground = Brushes.Black;
-                            updateButton.FontWeight = FontWeights.Regular;
-                        });
-                    })
-                    {
-                        IsBackground = true
-                    };
-                    factionStationThread.Start();
-                }
-                else { record.station = null; }
+                        updateButton.Foreground = Brushes.Black;
+                        updateButton.FontWeight = FontWeights.Regular;
+                    });
+                })
+                {
+                    IsBackground = true
+                };
+                factionStationThread.Start();
                 crimeMonitor()?.writeRecord();
             }
         }

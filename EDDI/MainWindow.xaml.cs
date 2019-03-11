@@ -803,6 +803,12 @@ namespace Eddi
             return configuration;
         }
 
+        private void npcCrewUpdated(object sender, DataTransferEventArgs e)
+        {
+            // Update the cargo monitor's information
+
+        }
+
         private void verboseLoggingEnabled(object sender, RoutedEventArgs e)
         {
             EDDIConfiguration eddiConfiguration = EDDIConfiguration.FromFile();

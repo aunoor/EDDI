@@ -16,7 +16,7 @@
         </UniformGrid>
         <DataGrid Margin="0,5" AutoGenerateColumns="False" x:Name="criminalRecord" CanUserAddRows="false" CanUserDeleteRows="False" TargetUpdated="criminalRecordUpdated">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="{x:Static resx:CrimeMonitor.header_name}" Width="*" Binding="{Binding Path=name, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, TargetNullValue={x:Static System:String.Empty}}">
+                <DataGridTextColumn Header="{x:Static resx:CrimeMonitor.header_faction}" Width="*" Binding="{Binding Path=faction, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, TargetNullValue={x:Static System:String.Empty}}">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="HorizontalContentAlignment" Value="Center" />

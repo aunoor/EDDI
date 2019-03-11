@@ -115,20 +115,20 @@ namespace EddiCrimeMonitor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Faction.
+        /// </summary>
+        public static string header_faction {
+            get {
+                return ResourceManager.GetString("header_faction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fines.
         /// </summary>
         public static string header_fines {
             get {
                 return ResourceManager.GetString("header_fines", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Faction.
-        /// </summary>
-        public static string header_name {
-            get {
-                return ResourceManager.GetString("header_name", resourceCulture);
             }
         }
         

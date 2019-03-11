@@ -121,6 +121,7 @@ namespace EddiCrimeMonitor
                     recordList = criminalrecord.ToList();
                 }
 
+                StarSystem system = StarSystemSqLiteRepository.Instance.GetOrFetchStarSystem("Chicomoztoc");
                 Thread.Sleep(5000);
             }
         }
@@ -468,7 +469,7 @@ namespace EddiCrimeMonitor
                 updateDat = configuration.updatedat;
 
                 // Build a new criminal record
-                List<FactionRecord> records = configuration.criminalrecord.OrderBy(c => c.name).ToList();
+                List<FactionRecord> records = configuration.criminalrecord.OrderBy(c => c.faction).ToList();
                 criminalrecord.Clear();
                 foreach (FactionRecord record in records)
                 {
@@ -505,12 +506,12 @@ namespace EddiCrimeMonitor
 
         public void _RemoveRecord(FactionRecord record)
         {
-            string faction = record.name.ToLowerInvariant();
+            string faction = record.faction.ToLowerInvariant();
             lock (recordLock)
             {
                 for (int i = 0; i < criminalrecord.Count; i++)
                 {
-                    if (criminalrecord[i].name.ToLowerInvariant() == faction)
+                    if (criminalrecord[i].faction.ToLowerInvariant() == faction)
                     {
                         criminalrecord.RemoveAt(i);
                         break;
@@ -525,7 +526,7 @@ namespace EddiCrimeMonitor
             {
                 return null;
             }
-            return criminalrecord.FirstOrDefault(c => c.name.ToLowerInvariant() == faction.ToLowerInvariant());
+            return criminalrecord.FirstOrDefault(c => c.faction.ToLowerInvariant() == faction.ToLowerInvariant());
         }
 
         private void AddCrimeReport(string faction, CrimeReport report)
@@ -591,69 +592,32 @@ namespace EddiCrimeMonitor
             return factionSystem;
         }
 
-        public void GetFactionData(FactionRecord record, string system = null, int cubeLy = 20)
+        public void GetFactionData(FactionRecord record, string homeSystem = null, int cubeLy = 100)
         {
-            if (record == null || record.name == null || record.name == Properties.CrimeMonitor.blank_faction) { return; }
-            string factionName = record.name;
+            if (record == null || record.faction == null || record.faction == Properties.CrimeMonitor.blank_faction) { return; }
 
-            StarSystem currentSystem = EDDI.Instance?.CurrentStarSystem;
-            if (currentSystem == null) { return; }
-
-            // Check for valid 'search' system
-            StarSystem searchSystem = currentSystem;
-            if (system != null)
+            if (homeSystem == null)
             {
-                searchSystem = StarSystemSqLiteRepository.Instance.GetOrCreateStarSystem(system, true);
-                if (searchSystem == null) { return; }
+                StarSystem currentSystem = EDDI.Instance?.CurrentStarSystem;
+                if (currentSystem == null) { return; }
+
+                List<StarSystem> cubeSystems = StarMapService.GetStarMapSystemsCube(currentSystem.name, cubeLy, false, false, false, false);
+                homeSystem = cubeSystems.FirstOrDefault(s => record.faction.Contains(s.name)).name;
+                if (homeSystem == null) { return; }
             }
+            StarSystem factionSystem = StarSystemSqLiteRepository.Instance.GetOrFetchStarSystem(homeSystem, true);
 
-            // Get the nearest faction system and station
-            List<StarSystem> cubeSystems = StarMapService.GetStarMapSystemsCube(searchSystem.name, cubeLy, false, false, false, false);
-            if (cubeSystems != null && cubeSystems.Any())
+            if (factionSystem != null)
             {
-                List<Station> factionStations = new List<Station>();
-                SortedList<decimal, string> nearestList = new SortedList<decimal, string>();
-
-                // Get systems data from local database and fetch any missing systems from EDSM
-                // Do not refresh local database data to minimize EDSM queries
-                cubeSystems = StarSystemSqLiteRepository.Instance.GetOrFetchStarSystems(cubeSystems.Select(s => s.name).ToArray(), true, false);
-
-                // Filter the systems in which the faction resides
-                List<StarSystem> factionSystems = cubeSystems.Where(s => s.factions?.Any(f => f.name == factionName) ?? false).ToList();
-                record.knownsystems = factionSystems.Select(s => s.name).ToList();
-
-                // Find the nearest faction system which meets game version and landing pad size requirements
-                string shipSize = EDDI.Instance?.CurrentShip?.size ?? "Large";
-                foreach (StarSystem starsystem in factionSystems)
-                {
-                    // Filter stations which meet the game version and landing pad size requirements
-                    factionStations = EDDI.Instance.inHorizons ? starsystem.stations : starsystem.orbitalstations
-                        .Where(s => s.LandingPadCheck(shipSize)).ToList();
-
-                    // Build list to find the faction system nearest to the current system
-                    if (factionStations.Count > 0)
-                    {
-                        decimal distance = CalculateDistance(currentSystem, starsystem);
-                        if (!nearestList.ContainsKey(distance))
-                        {
-                            nearestList.Add(distance, starsystem.name);
-                        }
-                    }
-                }
-
-                // Nearest faction system
-                string nearestSystem = nearestList.Values.FirstOrDefault();
-                if (nearestSystem == null) { return; }
-                record.system = nearestSystem;
-                StarSystem factionSystem = factionSystems.FirstOrDefault(s => s.name == nearestSystem);
-                record.Faction = factionSystem.factions.FirstOrDefault(f => f.name == record.name);
+                record.system = factionSystem.name;
 
                 // Filter stations within the faction system which meet the game version and landing pad size requirements
-                factionStations = EDDI.Instance.inHorizons ? factionSystem.stations : factionSystem.orbitalstations
+                string shipSize = EDDI.Instance?.CurrentShip?.size ?? "Large";
+                List<Station> factionStations = EDDI.Instance.inHorizons ? factionSystem.stations : factionSystem.orbitalstations
                     .Where(s => s.LandingPadCheck(shipSize)).ToList();
 
                 // Build list to find the faction station nearest to the main star
-                nearestList.Clear();
+                SortedList<decimal, string> nearestList = new SortedList<decimal, string>();
                 foreach (Station station in factionStations)
                 {
                     if (!nearestList.ContainsKey(station.distancefromstar ?? 0))
@@ -664,7 +628,6 @@ namespace EddiCrimeMonitor
 
                 // Faction station nearest to the main star
                 string nearestStation = nearestList.Values.FirstOrDefault();
-                if (nearestStation == null) { return; }
                 record.station = nearestStation;
             }
         }
@@ -678,7 +641,6 @@ namespace EddiCrimeMonitor
             List<StarSystem> cubeSystems = StarMapService.GetStarMapSystemsCube(currentSystem.name, cubeLy);
             if (cubeSystems != null && cubeSystems.Any())
             {
-                List<Station> IFStations = new List<Station>();
                 SortedList<decimal, string> nearestList = new SortedList<decimal, string>();
 
                 string shipSize = EDDI.Instance?.CurrentShip?.size ?? "Large";
@@ -692,13 +654,18 @@ namespace EddiCrimeMonitor
                 foreach (StarSystem starsystem in IFSystems)
                 {
                     // Filter stations which meet the game version and landing pad size requirements
-                    IFStations = EDDI.Instance.inHorizons ? starsystem.stations : starsystem.orbitalstations
-                        .Where(s => s.stationServices.Contains(service) && s.LandingPadCheck(shipSize)).ToList();
+                    int stationCount = (EDDI.Instance.inHorizons ? starsystem.stations : starsystem.orbitalstations)
+                        .Where(s => s.stationServices.Contains(service) && s.LandingPadCheck(shipSize))
+                        .Count();
 
                     // Build list to find the IF system nearest to the current system
-                    if (IFStations.Count > 0)
+                    if (stationCount > 0)
                     {
-                        nearestList.Add(CalculateDistance(currentSystem, starsystem), starsystem.name);
+                        decimal distance = CalculateDistance(currentSystem, starsystem);
+                        if (!nearestList.ContainsKey(distance))
+                        {
+                            nearestList.Add(distance, starsystem.name);
+                        }
                     }
                 }
 
@@ -708,14 +675,18 @@ namespace EddiCrimeMonitor
                 StarSystem IFSystem = IFSystems.FirstOrDefault(s => s.name == nearestSystem);
 
                 // Filter stations within the IF system which meet the game version and landing pad size requirements
-                IFStations = EDDI.Instance.inHorizons ? IFSystem.stations : IFSystem.orbitalstations
+                List<Station> IFStations = EDDI.Instance.inHorizons ? IFSystem.stations : IFSystem.orbitalstations
                     .Where(s => s.stationServices.Contains(service) && s.LandingPadCheck(shipSize)).ToList();
 
                 // Build list to find the IF station nearest to the main star
                 nearestList.Clear();
+
                 foreach (Station station in IFStations)
                 {
-                    nearestList.Add(station.distancefromstar ?? 0, station.name);
+                    if (!nearestList.ContainsKey(station.distancefromstar ?? 0))
+                    {
+                        nearestList.Add(station.distancefromstar ?? 0, station.name);
+                    }
                 }
 
                 // Interstellar Factors station nearest to the main star

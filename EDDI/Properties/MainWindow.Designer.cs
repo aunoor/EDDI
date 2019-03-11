@@ -295,6 +295,15 @@ namespace Eddi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Crew Details.
+        /// </summary>
+        public static string tab_crew_details_header {
+            get {
+                return ResourceManager.GetString("tab_crew_details_header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Frontier has an API that allows EDDI to obtain information about your ships, the current station&apos;s market, and various other items. This data is not available elsewhere. If you want EDDI to obtain and use this information you need to click the Login button and authorize EDDI for this data on Frontier&apos;s server..
         /// </summary>
         public static string tab_frontier_desc {
@@ -313,7 +322,7 @@ namespace Eddi.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If you are experiencing problems with your connection you can reset it and log back in again, which can clear the problem.
+        ///   Looks up a localized string similar to If you are experiencing problems with your connection you can reset it and log back in again, which can clear the problem..
         /// </summary>
         public static string tab_frontier_reset_desc {
             get {

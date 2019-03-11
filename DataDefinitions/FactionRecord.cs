@@ -15,16 +15,16 @@ namespace EddiDataDefinitions
     {
         // The faction associated with the claim, fine, or bounty
         [JsonIgnore]
-        private string _name;
-        public string name
+        private string _faction;
+        public string faction
         {
-            get => _name;
+            get => _faction;
             set
             {
-                if (_name != value)
+                if (_faction != value)
                 {
-                    _name = value;
-                    NotifyPropertyChanged("name");
+                    _faction = value;
+                    NotifyPropertyChanged("faction");
                 }
             }
         }
@@ -109,19 +109,15 @@ namespace EddiDataDefinitions
             }
         }
 
-        public Faction Faction { get; set; } = new Faction();
-        public List<string> knownsystems { get; set; }
         public List<CrimeReport> reportData { get; set; }
 
         // Default Constructor
         public FactionRecord() { }
 
         [JsonConstructor]
-        public FactionRecord(string name, string system = null, string station = null)
+        public FactionRecord(string faction)
         {
-            this.name = name;
-            this.system = system;
-            this.station = station;
+            this.faction = faction;
             reportData = new List<CrimeReport>();
         }
 

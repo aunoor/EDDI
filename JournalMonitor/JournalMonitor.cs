@@ -2157,25 +2157,28 @@ namespace EddiJournalMonitor
                             case "CrewHire":
                                 {
                                     string name = JsonParsing.getString(data, "Name");
+                                    long crewid = JsonParsing.getLong(data, "CrewID");
                                     string faction = getFactionName(data, "Faction");
                                     long price = JsonParsing.getLong(data, "Cost");
                                     CombatRating rating = CombatRating.FromRank(JsonParsing.getInt(data, "CombatRank"));
-                                    events.Add(new CrewHiredEvent(timestamp, name, faction, price, rating) { raw = line, fromLoad = fromLogLoad });
+                                    events.Add(new CrewHiredEvent(timestamp, name, crewid, faction, price, rating) { raw = line, fromLoad = fromLogLoad });
                                     handled = true;
                                     break;
                                 }
                             case "CrewFire":
                                 {
                                     string name = JsonParsing.getString(data, "Name");
-                                    events.Add(new CrewFiredEvent(timestamp, name) { raw = line, fromLoad = fromLogLoad });
+                                    long crewid = JsonParsing.getLong(data, "CrewID");
+                                    events.Add(new CrewFiredEvent(timestamp, name, crewid) { raw = line, fromLoad = fromLogLoad });
                                     handled = true;
                                     break;
                                 }
                             case "CrewAssign":
                                 {
                                     string name = JsonParsing.getString(data, "Name");
+                                    long crewid = JsonParsing.getLong(data, "CrewID");
                                     string role = getRole(data, "Role");
-                                    events.Add(new CrewAssignedEvent(timestamp, name, role) { raw = line, fromLoad = fromLogLoad });
+                                    events.Add(new CrewAssignedEvent(timestamp, name, crewid, role) { raw = line, fromLoad = fromLogLoad });
                                     handled = true;
                                     break;
                                 }
