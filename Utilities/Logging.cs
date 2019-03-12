@@ -220,6 +220,7 @@ namespace Utilities
 
         private static void SendToRollbar(ErrorLevel errorLevel, string message, object data, Dictionary<string, object> thisData, [CallerMemberName] string memberName = "", [CallerFilePath] string filePath = "")
         {
+            return;
             if (RollbarLocator.RollbarInstance.Config.Enabled != false)
             {
                 string personID = RollbarLocator.RollbarInstance.Config.Person?.Id;
