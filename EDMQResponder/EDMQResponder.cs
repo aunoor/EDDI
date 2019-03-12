@@ -58,12 +58,13 @@ namespace EDMQResponder
                 _server.Dispose();
             }
 
-            _server = new ResponseSocket();
+            _server = new PublisherSocket();
             try
             {
-                _server.Bind("@tcp://localhost:5556");
+                _server.Bind("tcp://localhost:5556");
             } catch (Exception e)
             {
+                //TODO: Add status to plugin's config window
                 Logging.Error("Can't bind socket: "+e.Message, memberName:"EDMQResponder");
                 return false;
             }
@@ -96,10 +97,13 @@ namespace EDMQResponder
         public void Handle(Event theEvent)
         {
             if (_server == null) return;
-            string output = JsonConvert.SerializeObject(theEvent);
+            string serializedOutput = JsonConvert.SerializeObject(theEvent);
+            byte[] encodedOutput = Encoding.UTF8.GetBytes(serializedOutput);
             var message = new NetMQMessage();
+            message.Append("events");
             message.Append(theEvent.GetType().Name);
-            message.Append(output);
+            message.Append(encodedOutput);
+            //XXX: Some values in event fields depend from selected EDDI language!
             _server.SendMultipartMessage(message);
         }
 
@@ -110,7 +114,7 @@ namespace EDMQResponder
 
         #region Private members
 
-        private ResponseSocket _server;
+        private PublisherSocket _server;
 
         #endregion
 
