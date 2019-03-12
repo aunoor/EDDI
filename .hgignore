@@ -1,0 +1,14 @@
+syntax: glob
+.idea
+.vs
+bin
+obj
+packages
+*.bak
+*.orig
+Debug/*
+Release/*
+BuildOutput/*
+TestResults
+
+
