@@ -11,6 +11,18 @@
              d:DesignHeight="300" d:DesignWidth="800">
     <DockPanel LastChildFill="True" Background="#FFE5E5E5" Margin="0,5">
         <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" Margin="5, 10" Text="{x:Static resx:CrimeMonitor.para1}" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Top">
+            <Label x:Name ="crimeProfitshareLabel" Grid.Row="4" Grid.Column="0" Margin="0,5" VerticalContentAlignment="Center" Content="{x:Static resx:CrimeMonitor.tab_crime_profitshare}"/>
+            <TextBox x:Name="crimeProfitShareInt"
+                     Grid.Row="4"
+                     Grid.Column="0"
+                     Margin="0,5"
+                     PreviewTextInput="EnsureValidInteger"
+                     TextChanged="profitShareChanged"
+                     TextAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     Height="25" Width="40"/>
+        </StackPanel>
         <UniformGrid DockPanel.Dock="Bottom" Rows="1" Margin="0,5">
             <Button Margin="10" HorizontalAlignment="Center" Click="addRecord" Content="{x:Static resx:CrimeMonitor.add_button}" />
         </UniformGrid>

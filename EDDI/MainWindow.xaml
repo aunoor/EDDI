@@ -163,29 +163,6 @@
                     </Grid>
                 </DockPanel>
             </TabItem>
-            <TabItem Header="{x:Static resx:MainWindow.tab_crew_details_header}">
-                <DockPanel LastChildFill="True" Background="#FFE5E5E5">
-                    <Grid DockPanel.Dock="Top">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                    </Grid>
-                    <DataGrid Margin="0,5" AutoGenerateColumns="False" x:Name="npcCrewData" CanUserAddRows="false" CanUserDeleteRows="False" TargetUpdated="npcCrewUpdated">
-                        <DataGrid.Columns>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-            </TabItem>
             <TabItem Header="{x:Static resx:MainWindow.tab_frontier_header}">
                 <DockPanel LastChildFill="True" Background="#FFE5E5E5">
                     <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" Margin="5" Text="{x:Static resx:MainWindow.tab_frontier_desc}" VerticalAlignment="Top"/>

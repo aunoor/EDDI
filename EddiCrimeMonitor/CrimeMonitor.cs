@@ -30,6 +30,7 @@ namespace EddiCrimeMonitor
         public long claims;
         public long fines;
         public long bounties;
+        public int? profitShare;
         private DateTime updateDat;
 
         private static readonly object recordLock = new object();
@@ -214,7 +215,7 @@ namespace EddiCrimeMonitor
             }
             int shipId = EDDI.Instance?.CurrentShip?.LocalId ?? 0;
             string currentSystem = EDDI.Instance?.CurrentStarSystem?.name;
-            FactionReport report = new FactionReport(@event.timestamp, true, shipId, null, currentSystem, @event.reward)
+            FactionReport report = new FactionReport(@event.timestamp, false, shipId, null, currentSystem, @event.reward)
             {
                 victim = @event.victimfaction
             };
@@ -238,17 +239,14 @@ namespace EddiCrimeMonitor
         {
             bool update = false;
 
-            foreach (Reward reward in @event.rewards.ToList())
+            FactionRecord record = GetRecordWithFaction(@event.rewards[0].faction);
+            if (record != null)
             {
-                FactionRecord record = GetRecordWithFaction(reward.faction);
-                if (record != null)
-                {
-                    decimal amount = reward.amount * (1 + (@event.brokerpercentage ?? 0) / 100);
-                    RemoveClaimReport(record, false);
-                    record.claims -= (long)amount;
-                    RemoveRecord(record);
-                    update = true;
-                }
+                decimal amount = @event.rewards[0].amount / (1 + (profitShare + @event.brokerpercentage ?? 0) / 100);
+                RemoveClaimReport(record, false);
+                record.claims -= (long)amount;
+                RemoveRecord(record);
+                update = true;
             }
             return update;
         }
@@ -277,6 +275,14 @@ namespace EddiCrimeMonitor
                 {
                     record = AddRecord(reward.faction);
                 }
+
+                int shipId = EDDI.Instance?.CurrentShip?.LocalId ?? 0;
+                FactionReport report = new FactionReport(@event.timestamp, true, shipId, null, currentSystem.name, @event.reward)
+                {
+                    victim = @event.faction
+                };
+                AddFactionReport(reward.faction, false, report);
+
                 double amount = (double)reward.amount * bonus;
                 record.claims += (long)amount;
             }
@@ -337,12 +343,15 @@ namespace EddiCrimeMonitor
         private bool _handleBountyRedeemedEvent(BountyRedeemedEvent @event)
         {
             bool update = false;
+
             foreach (Reward reward in @event.rewards.ToList())
             {
                 FactionRecord record = GetRecordWithFaction(reward.faction);
                 if (record != null)
                 {
-                    record.claims -= (long)reward.amount;
+                    decimal amount = reward.amount / (1 + (profitShare + @event.brokerpercentage ?? 0) / 100);
+                    RemoveClaimReport(record, false);
+                    record.claims -= (long)amount;
                     RemoveRecord(record);
                     update = true;
                 }
@@ -366,7 +375,7 @@ namespace EddiCrimeMonitor
             Crime crime = Crime.FromEDName(@event.crime);
             string currentSystem = EDDI.Instance?.CurrentStarSystem?.name;
             FactionReport report = new FactionReport(@event.timestamp, false, shipId, crime, currentSystem, @event.fine);
-            AddFactionReport(@event.faction, false, report);
+            AddFactionReport(@event.faction, true, report);
         }
 
         private void handleFinePaidEvent(FinePaidEvent @event)
@@ -463,6 +472,7 @@ namespace EddiCrimeMonitor
                     claims = claims,
                     fines = fines,
                     bounties = bounties,
+                    profitShare = profitShare,
                     updatedat = updateDat
                 };
                 configuration.ToFile();
@@ -480,6 +490,7 @@ namespace EddiCrimeMonitor
                 claims = configuration.claims;
                 fines = configuration.fines;
                 bounties = configuration.bounties;
+                profitShare = configuration.profitShare;
                 updateDat = configuration.updatedat;
 
                 // Build a new criminal record
@@ -557,13 +568,13 @@ namespace EddiCrimeMonitor
                 // Add the report to the relevant list and update the totals
                 if (crime)
                 {
-                    record.claimReports.Add(report);
-                    record.claims += report.amount;
+                    record.crimeReports.Add(report);
+                    if (report.bounty) { record.bounties += report.amount; } else { record.fines += report.amount; }
                 }
                 else
                 {
-                    record.crimeReports.Add(report);
-                    if (report.bounty) { record.bounties += report.amount; } else { record.fines += report.amount; }
+                    record.claimReports.Add(report);
+                    record.claims += report.amount;
                 }
             }
         }

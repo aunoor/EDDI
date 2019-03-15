@@ -13,11 +13,9 @@ namespace EddiCrimeMonitor
         public ObservableCollection<FactionRecord> criminalrecord { get; set; }
 
         public long claims { get; set; }
-
         public long fines { get; set; }
-
         public long bounties { get; set; }
-
+        public int? profitShare { get; set; }
         public DateTime updatedat { get; set; }
 
         [JsonIgnore]

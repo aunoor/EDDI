@@ -153,6 +153,9 @@
   <data name="remove_button" xml:space="preserve">
     <value>Remove</value>
   </data>
+  <data name="tab_crime_profitshare" xml:space="preserve">
+    <value>Total Crew profit share (Percentage):</value>
+  </data>
   <data name="update_button" xml:space="preserve">
     <value>Update</value>
   </data>

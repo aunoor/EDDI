@@ -169,6 +169,15 @@ namespace EddiCrimeMonitor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Total Crew profit share (Percentage):.
+        /// </summary>
+        public static string tab_crime_profitshare {
+            get {
+                return ResourceManager.GetString("tab_crime_profitshare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Update.
         /// </summary>
         public static string update_button {
